@@ -15,6 +15,8 @@
 // ============================================================================
 
 // Inclusão das bibliotecas padrão necessárias para entrada/saída, alocação de memória, manipulação de strings e tempo.
+#include <stdio.h>
+#include <string.h>
 
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
@@ -28,17 +30,62 @@
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
 // Função utilitária:
+void limparBufferEntrada() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
+
 int main() {
+    typedef struct {
+        char nome[50];
+        char cor[15];
+        int num_tropas;
+    } Territorio;
+
+    Territorio territorio[5];
+
+    printf("========================\n");
+    printf("Alocação de território\n");
+    printf("========================\n");
+
+    for (int i = 0; i < 5; i++) {
+        printf("------------------------\n");
+        printf("Nome do território %d:\n", i + 1);
+        fgets(territorio[i].nome, 50, stdin);
+        printf("Cor do exército:\n");
+        fgets(territorio[i].cor, 15, stdin);
+        printf("Número de tropas:\n");
+        scanf("%d", &territorio[i].num_tropas);
+        limparBufferEntrada();
+        printf("------------------------\n");
+    }
+    
+    printf("========================\n");
+    printf("Exibição dos territórios\n");
+    printf("========================\n");
+
+    for (int i = 0; i < 5; i++) {
+        printf("------------------------\n");
+        printf("Território %d:\n", i + 1);
+        printf("Nome: %s", territorio[i].nome);
+        printf("Cor: %s", territorio[i].cor);
+        printf("Número de tropas: %d\n", territorio[i].num_tropas);
+        printf("------------------------\n");
+    }
+    
+    
+    
+    
     // 1. Configuração Inicial (Setup):
-    // - Define o locale para português.
+    // - Define o locale para português.s
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     // - Define a cor do jogador e sorteia sua missão secreta.
-
+    
     // 2. Laço Principal do Jogo (Game Loop):
     // - Roda em um loop 'do-while' que continua até o jogador sair (opção 0) ou vencer.
     // - A cada iteração, exibe o mapa, a missão e o menu de ações.
@@ -47,14 +94,15 @@ int main() {
     //   - Opção 2: Verifica se a condição de vitória foi alcançada e informa o jogador.
     //   - Opção 0: Encerra o jogo.
     // - Pausa a execução para que o jogador possa ler os resultados antes da próxima rodada.
-
+    
     // 3. Limpeza:
     // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
-
     return 0;
 }
 
-// --- Implementação das Funções ---
+    
+    
+    // --- Implementação das Funções ---
 
 // alocarMapa():
 // Aloca dinamicamente a memória para o vetor de territórios usando calloc.
