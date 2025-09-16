@@ -25,6 +25,7 @@
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
 #define NUM_TERRITORIOS 5
 #define MAX_STRING 100
+#define NUM_MISSOES 3
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
@@ -45,8 +46,14 @@ void exibirMapa(Territorio* territorio);
 // Funções de lógica principal do jogo:
 void faseDeAtaque(Territorio* territorio);
 void simularAtaque(int* atacante, int* atacado, Territorio* territorio);
+void exibirMenuPrincipal();
+int sortearMissao();
+int verificarVitoria(int missao, Territorio* territorio);
+void exibirMissao(int missao);
+
 // Função utilitária:
 void limparBufferEntrada();
+
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -63,35 +70,45 @@ int main() {
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     inicializarTerritorios(mapa);
     // - Define a cor do jogador e sorteia sua missão secreta.
+    int missao = sortearMissao();
     
     // 2. Laço Principal do Jogo (Game Loop):
     // - Roda em um loop 'do-while' que continua até o jogador sair (opção 0) ou vencer.
     // - A cada iteração, exibe o mapa, a missão e o menu de ações.
-    do {
-        exibirMapa(mapa);
-        printf("========================\n");
-        printf("Digite 0 para sair e 1 para continuar\n");
-        printf("========================\n");
-        int opcao = 0;
-        scanf("%d", &opcao);
-        limparBufferEntrada();
-        if (opcao == 0) {
-            break;
-        }
-
-        faseDeAtaque(mapa);
-    } while (1);
-
     // - Lê a escolha do jogador e usa um 'switch' para chamar a função apropriada:
     //   - Opção 1: Inicia a fase de ataque.
     //   - Opção 2: Verifica se a condição de vitória foi alcançada e informa o jogador.
     //   - Opção 0: Encerra o jogo.
     // - Pausa a execução para que o jogador possa ler os resultados antes da próxima rodada.
-    
-    // 3. Limpeza:
-    // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
-    free(mapa);
-    return 0;
+    do {
+        if (verificarVitoria(missao, mapa)) {
+            exibirMissao(missao);
+            printf("Parabéns, você venceu!\n");
+            free(mapa);
+            return 0;
+        }
+        exibirMenuPrincipal();
+        int opcao = 0;
+        scanf("%d", &opcao);
+        limparBufferEntrada();
+        switch (opcao) {
+            case 1:
+                exibirMapa(mapa);
+                break;
+            case 2:
+                faseDeAtaque(mapa);
+                break;
+            case 3:
+                exibirMissao(missao);
+                break;
+            case 0:
+                free(mapa);
+                return 0;
+            default:
+                printf("Opção inválida!\n");
+        }
+    } while (1);
+
 }
 
 
@@ -132,12 +149,18 @@ void inicializarTerritorios(Territorio* territorio) {
     }
 }
 
-
-// liberarMemoria():
-// Libera a memória previamente alocada para o mapa usando free.
-
 // exibirMenuPrincipal():
 // Imprime na tela o menu de ações disponíveis para o jogador.
+void exibirMenuPrincipal() {
+    printf("========================\n");
+    printf("Escolha uma opção:\n");
+    printf("========================\n");
+    printf("1 - Verificar Mapa\n");
+    printf("2 - Atacar\n");
+    printf("3 - Ver missão\n");
+    printf("0 - Sair\n");
+    printf("------------------------\n");
+}
 
 // exibirMapa():
 // Mostra o estado atual de todos os territórios no mapa, formatado como uma tabela.
@@ -153,6 +176,15 @@ void exibirMapa(Territorio* territorio) {
 }
 // exibirMissao():
 // Exibe a descrição da missão atual do jogador com base no ID da missão sorteada.
+void exibirMissao(int missao) {
+    char missoes[3][MAX_STRING] = {
+        "Destruir o território 1",
+        "Destruir o território 2",
+        "Destruir o território 3",
+    };
+
+    printf("Missão: %s\n", missoes[missao - 1]);
+}
 
 // faseDeAtaque():
 // Gerencia a interface para a ação de ataque, solicitando ao jogador os territórios de origem e destino.
@@ -211,11 +243,26 @@ void simularAtaque(int* atacante, int* atacado, Territorio* territorio) {
 }
 // sortearMissao():
 // Sorteia e retorna um ID de missão aleatório para o jogador.
+int sortearMissao() {
+    return rand() % NUM_MISSOES + 1;
+}
 
 // verificarVitoria():
 // Verifica se o jogador cumpriu os requisitos de sua missão atual.
 // Implementa a lógica para cada tipo de missão (destruir um exército ou conquistar um número de territórios).
 // Retorna 1 (verdadeiro) se a missão foi cumprida, e 0 (falso) caso contrário.
+int verificarVitoria(int missao, Territorio* territorio) {
+    switch (missao) {
+        case 1:
+            return territorio[0].num_tropas <= 0;
+        case 2:
+            return territorio[1].num_tropas <= 0;
+        case 3:
+            return territorio[2].num_tropas <= 0;
+        default:
+            return 0;
+    }
+}
 
 // limparBufferEntrada():
 // Função utilitária para limpar o buffer de entrada do teclado (stdin), evitando problemas com leituras consecutivas de scanf e getchar.
